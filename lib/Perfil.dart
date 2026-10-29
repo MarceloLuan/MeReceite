@@ -159,7 +159,6 @@ class Perfil extends StatelessWidget {
                   Icon(Icons.local_fire_department, color: vermelho),
                 ],
               ),
-
               const SizedBox(height: 14),
 
               Container(
