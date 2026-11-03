@@ -4,8 +4,41 @@ const vermelho = Color(0xFFD93636);
 const creme = Color(0xFFFFF8F0);
 const textoEscuro = Color(0xFF302521);
 
-class Perfil extends StatelessWidget {
+class Perfil extends StatefulWidget {
   const Perfil({super.key});
+
+  @override
+  State<Perfil> createState() => _PerfilState();
+}
+
+class _PerfilState extends State<Perfil> {
+  final _consultaController = TextEditingController();
+  String? _mensagemBusca;
+  String? _termoPesquisado;
+
+  @override
+  void dispose() {
+    _consultaController.dispose();
+    super.dispose();
+  }
+
+  void _pesquisarReceita() {
+    final termo = _consultaController.text.trim();
+
+    if (termo.isEmpty) {
+      setState(() {
+        _termoPesquisado = null;
+        _mensagemBusca =
+            'Digite o nome de uma receita para iniciar a pesquisa.';
+      });
+      return;
+    }
+
+    setState(() {
+      _termoPesquisado = termo;
+      _mensagemBusca = null;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -85,21 +118,63 @@ class Perfil extends StatelessWidget {
 
               const SizedBox(height: 20),
 
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: const Color(0xFFF0E5DA)),
+              Text(
+                'Pesquisar receita pelo nome',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: textoEscuro,
                 ),
-                child: const TextField(
-                  decoration: InputDecoration(
-                    icon: Icon(Icons.search, color: vermelho),
-                    hintText: 'Busque receitas ou ingredientes',
-                    border: InputBorder.none,
+              ),
+              const SizedBox(height: 8),
+              TextField(
+                controller: _consultaController,
+                textInputAction: TextInputAction.search,
+                onSubmitted: (_) => _pesquisarReceita(),
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: Colors.white,
+                  prefixIcon: const Icon(Icons.search, color: vermelho),
+                  hintText: 'Ex.: Lasanha caseira',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    borderSide: const BorderSide(color: Color(0xFFF0E5DA)),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    borderSide: const BorderSide(color: Color(0xFFF0E5DA)),
+                  ),
+                  errorText: _mensagemBusca,
+                ),
+              ),
+              const SizedBox(height: 10),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: _pesquisarReceita,
+                  icon: const Icon(Icons.search),
+                  label: const Text('Pesquisar'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: vermelho,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 13),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
                   ),
                 ),
               ),
+              if (_termoPesquisado != null) ...[
+                const SizedBox(height: 10),
+                Text(
+                  'Pesquisa realizada para: $_termoPesquisado',
+                  key: const Key('resultado-pesquisa'),
+                  style: const TextStyle(
+                    color: textoEscuro,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
 
               const SizedBox(height: 28),
 
@@ -114,7 +189,7 @@ class Perfil extends StatelessWidget {
               const SizedBox(height: 15),
 
               SizedBox(
-                height: 100,
+                height: 110,
                 child: ListView(
                   scrollDirection: Axis.horizontal,
                   children: const [
